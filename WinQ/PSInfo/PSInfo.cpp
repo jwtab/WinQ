@@ -111,14 +111,14 @@ void CPSInfo::DosPath2Path(wchar_t * pwszFilePath)
 
 BOOL CPSInfo::GetProcCmdLine(unsigned long ulPid, wchar_t * pwszCmdLine, unsigned long dwBufLen)
 {
-	BOOL bRet = TRUE;
-	LONG status;
-	PROCESS_BASIC_INFORMATION pbi;
-	PEB Peb;
-	PROCESS_PARAMETERS ProcParam;
-	DWORD dwDummy;
-	DWORD dwSize;
-	LPVOID IpAddress;
+	BOOL bRet = FALSE;
+
+	NTSTATUS status;
+	PROCESS_BASIC_INFORMATION * pbi = NULL;
+	PEB peb;
+	DWORD dwBytesRead = 0;		
+	RTL_USER_PROCESS_PARAMETERS peb_upp;
+	HANDLE hHeap = GetProcessHeap();
 
 	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, ulPid);
 	if (NULL == hProcess)
@@ -130,24 +130,53 @@ BOOL CPSInfo::GetProcCmdLine(unsigned long ulPid, wchar_t * pwszCmdLine, unsigne
 		"NtQueryInformationProcess");
 	if (NULL != pQueryInfo)
 	{
-		//查询进程的基本信息,获取PEB
-		status = pQueryInfo(hProcess, 0, (PVOID)&pbi, sizeof(PROCESS_BASIC_INFORMATION), NULL);
-		
-		//读取进程的PEB指针
-		if (ReadProcessMemory(hProcess, pbi.PebBaseAddress, &Peb, sizeof(PEB), &dwDummy))
-		{
-			//获取目标进程空间存储的命令行参数字符串的指针
-			if (ReadProcessMemory(hProcess, Peb.ProcessParameters, &ProcParam, sizeof(PROCESS_PARAMETERS), &dwDummy))
-			{
-				IpAddress = ProcParam.CommandLine.Buffer;
-				dwSize = ProcParam.CommandLine.Length;
-
-				//读取目标进程的命令行参数到本进程的缓冲区
-				ReadProcessMemory(hProcess, IpAddress, pwszCmdLine, dwSize, &dwDummy);
-			}			
-		}	
+		pbi = (PROCESS_BASIC_INFORMATION*)HeapAlloc(hHeap,HEAP_ZERO_MEMORY, sizeof(PROCESS_BASIC_INFORMATION));
+		if (NULL != pbi)
+		{			
+			status = pQueryInfo(hProcess, ProcessBasicInformation, pbi, sizeof(PROCESS_BASIC_INFORMATION), &dwBytesRead);
+		}				
 	}
 	
+	if (status >= 0)
+	{
+		// (PEB)
+		if (pbi->PebBaseAddress)
+		{
+			if (ReadProcessMemory(hProcess, pbi->PebBaseAddress, &peb, sizeof(peb), &dwBytesRead))
+			{
+				//dwSessionID = (DWORD)peb.SessionId;
+				//cBeingDebugged = (BYTE)peb.BeingDebugged;
+				
+				dwBytesRead = 0;
+				if (ReadProcessMemory(hProcess,peb.ProcessParameters,&peb_upp,sizeof(RTL_USER_PROCESS_PARAMETERS),&dwBytesRead))
+				{
+					if (peb_upp.CommandLine.Length > 0) 
+					{						
+						wchar_t *pwszBuffer = (WCHAR *)HeapAlloc(hHeap, HEAP_ZERO_MEMORY, peb_upp.CommandLine.Length);												
+						if (pwszBuffer)
+						{
+							if (ReadProcessMemory(hProcess,peb_upp.CommandLine.Buffer,pwszBuffer,
+								peb_upp.CommandLine.Length,&dwBytesRead))
+							{
+								//取固定长度.
+								memcpy(pwszCmdLine, pwszBuffer, peb_upp.CommandLine.Length);
+							}
+
+							HeapFree(hHeap, 0, pwszBuffer);							
+							pwszBuffer = NULL;
+						}
+					}			
+				}
+			}
+		}
+	}
+
+	if (NULL != pbi)
+	{
+		HeapFree(hHeap, 0, pbi);
+		pbi = NULL;
+	}
+
 	CloseHandle(hProcess);
 	hProcess = NULL;
 

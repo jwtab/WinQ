@@ -4,6 +4,7 @@
 
 #include <Windows.h>
 #include <tlhelp32.h>
+#include <winternl.h>
 #include <Psapi.h>
 
 #include <stdio.h>
@@ -47,63 +48,7 @@ typedef struct Proc_Info
 }PROC_INFO,*LPPROC_INFO;
 typedef vector<PROC_INFO> ARRAY_PROC;
 
-
-//
-//UNICODE_STRING结构定义
-typedef struct
-{
-	USHORT Length;
-	USHORT MaximumLength;
-	PWSTR Buffer;
-}UNICODE_STRING, *PUNICODE_STRING;
-
-//进程参数结构定义,必有和NativeAPI规范相符和
-typedef struct
-{
-	ULONG AllocationSize;
-	ULONG ActualSize;
-	ULONG Flags;
-	ULONG Unknown1;
-	UNICODE_STRING Unknown2;
-	HANDLE InputHandle;
-	HANDLE OutputHandle;
-	HANDLE ErrorHandle;
-	UNICODE_STRING CurrentDirectory;
-	HANDLE CurrentDirectoryHandle;
-	UNICODE_STRING SearchPaths;
-	UNICODE_STRING ApplicationName;
-	UNICODE_STRING CommandLine;
-	PVOID EnvironmentBlock;
-	ULONG Unknown[9];
-	UNICODE_STRING Unknown3;
-	UNICODE_STRING Unknown4;
-	UNICODE_STRING Unknown5;
-	UNICODE_STRING Unknown6;
-}PROCESS_PARAMETERS, *PPROCESS_PARAMETERS;
-
-//PEB: Process Environment Block, 进程环境变量块
-typedef struct
-{
-	ULONG AllocationSize;
-	ULONG Unknown1;
-	HINSTANCE ProcessHinstance;
-	PVOID ListDlls;
-	PPROCESS_PARAMETERS ProcessParameters;
-	ULONG Unknown2;
-	HANDLE Heap;
-}PEB, *PPEB;
-
-//进程基本信息结构定义
-typedef struct
-{
-	DWORD ExitStatus;
-	PPEB PebBaseAddress;
-	DWORD AffinityMask;
-	DWORD BasePriority;
-	ULONG UniqueProcessId;
-	ULONG InheritedFromUniqueProcessId;
-}PROCESS_BASIC_INFORMATION;
-
+//动态加载的函数. ntdll.dll
 typedef NTSTATUS ( WINAPI *FUN_NtQueryInformationProcess)(
 	__in       HANDLE ProcessHandle,
 	__in       UINT  ProcessInformationClass,
