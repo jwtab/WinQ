@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="PEInfo">
+      <UniqueIdentifier>{17010777-e423-46ad-ac31-5b6f88d73517}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -24,6 +27,12 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PEInfo\PEInfo.h">
+      <Filter>PEInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="PEInfo\PEInfo_main.h">
+      <Filter>PEInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -31,6 +40,12 @@
     </ClCompile>
     <ClCompile Include="WinQ.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PEInfo\PEInfo.cpp">
+      <Filter>PEInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="PEInfo\PEInfo_main.cpp">
+      <Filter>PEInfo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
