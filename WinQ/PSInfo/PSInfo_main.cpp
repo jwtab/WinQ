@@ -3,10 +3,17 @@
 #include "PSInfo_main.h"
 
 /*
-	WinQ.exe -pid
-	WinQ.exe -cmd
-	WinQ.exe -mod <pid>
-	WinQ.exe -svr 
+	遍历进程
+	WinQ.exe -ps -pid
+
+	//遍历命令行
+	WinQ.exe -ps -cmd
+
+	//遍历指定进程的模块
+	WinQ.exe -ps -mod <pid>
+
+	//遍历服务
+	WinQ.exe -ps -svr 
 */
 int main_ps(int argc, char **argv)
 {

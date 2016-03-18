@@ -5,16 +5,28 @@
 
 /*
 	解析PE基本信息;
+	WinQ.exe -pe -b <mz_file_path>
+
 	解析PE导入函数;
+	WinQ.exe -pe -i <mz_file_path>
+
 	解析PE导出函数.
+	WinQ.exe -pe -o <mz_file_path>
 */
 int main_pe(int argc, char **argv)
 {
-	Show_PE_Base(argv[2]);
-
-	Show_PE_Import(argv[2]);
-
-	Show_PE_Export(argv[2]);
+	if (0 == strcmp("-b",argv[2]))
+	{
+		Show_PE_Base(argv[3]);
+	}
+	else if (0 == strcmp("-i", argv[2]))
+	{
+		Show_PE_Import(argv[3]);
+	}
+	else if (0 == strcmp("-o", argv[2]))
+	{
+		Show_PE_Export(argv[3]);
+	}	
 
 	return 0;
 }
