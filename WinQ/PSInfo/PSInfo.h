@@ -15,25 +15,6 @@ using namespace std;
 
 #pragma comment(lib,"Psapi.lib")
 
-//操作系统信息.
-typedef struct Os_Info
-{
-	wchar_t wszOsVersion[128];
-
-	//是不是x64系统，是不是正版系统.
-	BOOL bIsX64OS;
-	BOOL bIsRegister;
-
-	//内存和硬盘大小.
-	unsigned long ulMemorySize;
-	unsigned long ulDiskSize;
-	wchar_t wszDiskSerialNumber[128];
-
-	//ip地址
-	wchar_t wszIpAddr[128];
-	BOOL bIsIPV4;
-}OS_INFO,*LPOS_INFO;
-
 //进程信息
 typedef struct Proc_Info
 {
@@ -48,6 +29,35 @@ typedef struct Proc_Info
 }PROC_INFO,*LPPROC_INFO;
 typedef vector<PROC_INFO> ARRAY_PROC;
 
+//模块信息
+typedef struct Mod_Info
+{
+	//模块名称.
+	wchar_t wszModFileName[128];
+
+	//模块全路径.
+	wchar_t wszModFilePath[MAX_PATH];
+}MOD_INFO,*LPMOD_INFO;
+typedef vector<MOD_INFO> ARRAY_MOD;
+
+//服务信息
+typedef struct Svr_Info
+{
+	//服务名称.
+	wchar_t wszServerName[128];
+
+	//pid
+	unsigned long ulPid;
+
+	//服务命令行.
+	wchar_t wszServerCmdLine[1024];
+
+	//服务是否在运行.
+	unsigned long dwCurrentState;
+	unsigned long dwServiceType;
+}SVR_INFO,*LPSVR_INFO;
+typedef vector<SVR_INFO> ARRAY_SVR;
+
 //动态加载的函数. ntdll.dll
 typedef NTSTATUS ( WINAPI *FUN_NtQueryInformationProcess)(
 	__in       HANDLE ProcessHandle,
@@ -57,6 +67,9 @@ typedef NTSTATUS ( WINAPI *FUN_NtQueryInformationProcess)(
 	__out_opt  PULONG ReturnLength
 	);
 
+typedef NTSTATUS (WINAPI *FUN_RtlGetVersion)(
+	IN OUT PRTL_OSVERSIONINFOW  lpVersionInformation
+	);
 
 class CPSInfo
 {
@@ -69,13 +82,15 @@ private:
 	BOOL SetPrivilegeEx(HANDLE hToken, LPCTSTR Privilege, BOOL bEnablePrivilege);
 
 	void DosPath2Path(wchar_t * pwszFilePath);
+	BOOL GetServiceExePath(SC_HANDLE hSCM, const wchar_t * pwszSrvName,wchar_t * pwszSvrFilePath);
 
-public:
-	BOOL GetOSInfo(LPOS_INFO lpOSInfo);
+public:	
 	BOOL GetProcList(ARRAY_PROC & procList);
 	BOOL GetProcPath(unsigned long ulPid, wchar_t * pwszExePath);
 	BOOL GetProcCmdLine(unsigned long ulPid, wchar_t * pwszCmdLine,unsigned long dwBufLen);
 
+	BOOL GetModList(unsigned long ulPid, ARRAY_MOD &modList);
+	BOOL GetSvrlist(ARRAY_SVR &svrList);
 private:
 	BOOL m_bIsHaveDebug;
 };

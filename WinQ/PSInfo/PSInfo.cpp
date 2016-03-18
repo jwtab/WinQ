@@ -126,7 +126,7 @@ BOOL CPSInfo::GetProcCmdLine(unsigned long ulPid, wchar_t * pwszCmdLine, unsigne
 		return bRet;
 	}
 
-	FUN_NtQueryInformationProcess pQueryInfo = (FUN_NtQueryInformationProcess)GetProcAddress(GetModuleHandleW(L"ntdll"), 
+	FUN_NtQueryInformationProcess pQueryInfo = (FUN_NtQueryInformationProcess)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), 
 		"NtQueryInformationProcess");
 	if (NULL != pQueryInfo)
 	{
@@ -250,8 +250,168 @@ BOOL CPSInfo::SetPrivilegeEx(HANDLE hToken, LPCTSTR Privilege, BOOL bEnablePrivi
 	return TRUE;
 }
 
-BOOL CPSInfo::GetOSInfo(LPOS_INFO lpOSInfo)
+BOOL CPSInfo::GetModList(unsigned long ulPid, ARRAY_MOD &modList)
 {
-	return TRUE;
+	BOOL bRet = FALSE;
+
+	HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 
+		FALSE, ulPid);
+	if (NULL == hProc)
+	{
+		return bRet;
+	}
+
+	//设置默认1024，应该不会超过这个数目吧
+	HMODULE hMod[1024] = { 0 };
+	DWORD cbNeeded;
+	
+	//获取进程模块. 
+	if (EnumProcessModules(hProc, hMod, sizeof(hMod), &cbNeeded))
+	{
+		bRet = TRUE;
+
+		//获得模块路径  
+		for (int i = 1; i <= cbNeeded / sizeof(HMODULE); i++)
+		{
+			wchar_t wszModPath[MAX_PATH] = { 0 };
+			if (GetModuleFileNameExW(hProc, hMod[i], wszModPath, MAX_PATH))
+			{
+				MOD_INFO modNode = { 0 };
+
+				wcscpy(modNode.wszModFilePath, wszModPath);
+
+				wchar_t * pwszTail = wcsrchr(wszModPath, L'\\');
+				if (NULL != pwszTail)
+				{
+					pwszTail++;
+
+					wcscpy(modNode.wszModFileName, pwszTail);
+				}
+
+				modList.push_back(modNode);
+			}
+		}
+	}
+
+	CloseHandle(hProc);
+	hProc = NULL;
+
+	return bRet;
 }
 
+BOOL CPSInfo::GetSvrlist(ARRAY_SVR &svrList)
+{
+	BOOL bRet = FALSE;
+
+	SC_HANDLE hSCM = NULL;
+	char *pBuf = NULL;                  // 缓冲区指针  
+	DWORD dwBufSize = 0;                // 传入的缓冲长度  
+	DWORD dwBufNeed = 0;                // 需要的缓冲长度  
+	DWORD dwNumberOfService = 0;        // 返回的服务个数  
+	ENUM_SERVICE_STATUS_PROCESS *pServiceInfo = NULL;   // 服务信息  
+
+	hSCM = OpenSCManager(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE | SC_MANAGER_CONNECT);
+	if (NULL == hSCM)
+	{
+		return bRet;
+	}
+
+	// 获取需要的缓冲区大小  
+	EnumServicesStatusEx(hSCM, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+		NULL, dwBufSize, &dwBufNeed, &dwNumberOfService, NULL, NULL);
+
+	//多设置存放1个服务信息的长度  
+	dwBufSize = dwBufNeed + sizeof(ENUM_SERVICE_STATUS_PROCESS);
+	pBuf = new char[dwBufSize];
+	if (NULL != pBuf)
+	{
+		memset(pBuf, 0, dwBufSize);
+
+		//获取服务信息  
+		if (EnumServicesStatusEx(hSCM, SC_ENUM_PROCESS_INFO, SERVICE_WIN32, SERVICE_STATE_ALL,
+			(LPBYTE)pBuf, dwBufSize, &dwBufNeed, &dwNumberOfService, NULL, NULL))
+		{
+			pServiceInfo = (LPENUM_SERVICE_STATUS_PROCESS)pBuf;
+
+			//打印取得的服务信息  
+			for (unsigned int i = 0; i < dwNumberOfService; i++)
+			{
+				SVR_INFO svrNode = { 0 };
+				svrNode.ulPid = pServiceInfo[i].ServiceStatusProcess.dwProcessId;
+				svrNode.dwCurrentState = pServiceInfo[i].ServiceStatusProcess.dwCurrentState;
+				svrNode.dwServiceType = pServiceInfo[i].ServiceStatusProcess.dwServiceType;
+				wcscpy(svrNode.wszServerName, pServiceInfo[i].lpServiceName);
+
+				//获取服务的全路径+命令行.
+				GetServiceExePath(hSCM, svrNode.wszServerName, svrNode.wszServerCmdLine);
+
+				svrList.push_back(svrNode);
+			}				
+		}
+
+		delete []pBuf;
+		pBuf = NULL;
+	}
+	
+	//关闭打开的服务句柄.
+	bRet = CloseServiceHandle(hSCM);
+	hSCM = NULL;
+
+	return bRet;
+}
+
+BOOL CPSInfo::GetServiceExePath(SC_HANDLE hSCM, const wchar_t * pwszSrvName,wchar_t * pwszSvrFilePath)
+{
+	BOOL bRet = FALSE;
+
+	LPQUERY_SERVICE_CONFIG lpsc = NULL;
+	DWORD dwBytesNeeded, cbBufSize, dwError;
+
+	SC_HANDLE hSvc = ::OpenService(hSCM, pwszSrvName, SERVICE_QUERY_CONFIG);
+	if (hSvc == NULL)
+	{
+		return bRet;
+	}
+
+	do
+	{
+		if (!QueryServiceConfig(
+			hSvc,
+			NULL,
+			0,
+			&dwBytesNeeded))
+		{
+			dwError = GetLastError();
+			if (ERROR_INSUFFICIENT_BUFFER == dwError)
+			{
+				cbBufSize = dwBytesNeeded;
+				lpsc = (LPQUERY_SERVICE_CONFIG)LocalAlloc(LMEM_FIXED, cbBufSize);
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if (!QueryServiceConfig(
+			hSvc,
+			lpsc,
+			cbBufSize,
+			&dwBytesNeeded))
+		{
+			break;
+		}
+
+		wcscpy(pwszSvrFilePath, lpsc->lpBinaryPathName);
+
+		LocalFree(lpsc);
+		lpsc = NULL;
+
+		bRet = TRUE;
+	} while (false);
+
+	CloseServiceHandle(hSvc);
+	hSvc = NULL;	
+
+	return bRet;
+}

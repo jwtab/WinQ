@@ -2,6 +2,12 @@
 #include "stdafx.h"
 #include "PSInfo_main.h"
 
+/*
+	WinQ.exe -pid
+	WinQ.exe -cmd
+	WinQ.exe -mod <pid>
+	WinQ.exe -svr 
+*/
 int main_ps(int argc, char **argv)
 {
 	if (0 == strcmp("-pid",argv[2]))
@@ -11,6 +17,14 @@ int main_ps(int argc, char **argv)
 	else if (0 == strcmp("-cmd", argv[2]))
 	{
 		Show_pid_cmdline();
+	}
+	else if (0 == strcmp("-mod",argv[2]))
+	{
+		Show_mod_list(atoi(argv[3]));
+	}
+	else if (0 == strcmp("-svr",argv[2]))
+	{
+		Show_server_list();
 	}
 
 	return 0;
@@ -50,5 +64,33 @@ void Show_pid_cmdline()
 
 		wprintf(L"%d        %s    \r\n", (*it).ulProcID, wszExePath);		
 		wprintf(L"%s \r\n", wszCmdLine);
+	}
+}
+
+void Show_mod_list(unsigned long pid)
+{
+	CPSInfo ps;
+
+	ARRAY_MOD modList;
+	ps.GetModList(pid, modList);
+
+	ARRAY_MOD::iterator it;
+	for (it = modList.begin(); it != modList.end(); it++)
+	{
+		wprintf(L"%s     %s\r\n", (*it).wszModFileName, (*it).wszModFilePath);
+	}
+}
+
+void Show_server_list()
+{
+	CPSInfo ps;
+
+	ARRAY_SVR svrList;
+	ps.GetSvrlist(svrList);
+
+	ARRAY_SVR::iterator it;
+	for (it = svrList.begin(); it != svrList.end(); it++)
+	{
+		wprintf(L"%s     %s\r\n", (*it).wszServerName, (*it).wszServerCmdLine);
 	}
 }
