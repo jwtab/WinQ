@@ -19,6 +19,9 @@
     <Filter Include="PSInfo">
       <UniqueIdentifier>{94df3156-8c55-4fd0-b7ca-09f25e808484}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UserInfo">
+      <UniqueIdentifier>{37c2f8f5-c3a3-491d-b6d6-3a58c3b7b44c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -42,6 +45,12 @@
     <ClInclude Include="PSInfo\PSInfo_main.h">
       <Filter>PSInfo</Filter>
     </ClInclude>
+    <ClInclude Include="UserInfo\UserInfo.h">
+      <Filter>UserInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInfo\UserInfo_main.h">
+      <Filter>UserInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -61,6 +70,12 @@
     </ClCompile>
     <ClCompile Include="PSInfo\PSInfo_main.cpp">
       <Filter>PSInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInfo\UserInfo.cpp">
+      <Filter>UserInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInfo\UserInfo_main.cpp">
+      <Filter>UserInfo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
