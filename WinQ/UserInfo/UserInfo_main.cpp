@@ -50,7 +50,15 @@ void Show_user_detail(const char * pwszUserName)
 
 	if (USER_PRIV_GUEST == dwPrivilege)
 	{
-
+		printf("GUEST user\r\n");
+	}
+	else if (USER_PRIV_USER == dwPrivilege)
+	{
+		printf("USER user\r\n");
+	}
+	else if (USER_PRIV_ADMIN == dwPrivilege)
+	{
+		printf("ADMIN user\r\n");
 	}
 
 	printf("%d\r\n",dwPrivilege);
