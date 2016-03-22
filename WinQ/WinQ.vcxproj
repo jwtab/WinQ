@@ -148,6 +148,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ModInfo\ModInfo.h" />
+    <ClInclude Include="ModInfo\ModInfo_main.h" />
     <ClInclude Include="PEInfo\PEInfo.h" />
     <ClInclude Include="PEInfo\PEInfo_main.h" />
     <ClInclude Include="PSInfo\PSInfo.h" />
@@ -158,6 +160,8 @@
     <ClInclude Include="UserInfo\UserInfo_main.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ModInfo\ModInfo.cpp" />
+    <ClCompile Include="ModInfo\ModInfo_main.cpp" />
     <ClCompile Include="PEInfo\PEInfo.cpp" />
     <ClCompile Include="PEInfo\PEInfo_main.cpp" />
     <ClCompile Include="PSInfo\PSInfo.cpp" />

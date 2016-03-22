@@ -22,6 +22,9 @@
     <Filter Include="UserInfo">
       <UniqueIdentifier>{37c2f8f5-c3a3-491d-b6d6-3a58c3b7b44c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ModInfo">
+      <UniqueIdentifier>{3be451af-9438-40d5-91e4-5a9aadf31f54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -51,6 +54,12 @@
     <ClInclude Include="UserInfo\UserInfo_main.h">
       <Filter>UserInfo</Filter>
     </ClInclude>
+    <ClInclude Include="ModInfo\ModInfo.h">
+      <Filter>ModInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="ModInfo\ModInfo_main.h">
+      <Filter>ModInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -76,6 +85,12 @@
     </ClCompile>
     <ClCompile Include="UserInfo\UserInfo_main.cpp">
       <Filter>UserInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="ModInfo\ModInfo.cpp">
+      <Filter>ModInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="ModInfo\ModInfo_main.cpp">
+      <Filter>ModInfo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
