@@ -11,7 +11,7 @@ int main_mod(int argc, char **argv)
 	}
 	else if (0 == strcmp("-s", argv[2]))
 	{
-
+		mod_Show_Sign(argv[3]);
 	}
 
 	return 0;
@@ -33,5 +33,12 @@ void mod_Show_Base(const char * pszModPath)
 
 void mod_Show_Sign(const char * pszModPath)
 {
+	MOD_SIGN_INFO  signInfo = { 0 };
 
+	GetModSignInfo(pszModPath, signInfo);
+
+	wprintf(L"User:%s\r\nIssuer:%s\r\nSn:%s\r\n",
+		signInfo.wszUser,
+		signInfo.wszIssuer,
+		signInfo.wszSerialNumber);
 }
