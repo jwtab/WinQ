@@ -11,3 +11,6 @@ PSInfo
 UserInfo
 	查看Windows操作系统上的账号信息，账号权限;
 	
+ModInfo
+	查询Windows操作系统的模块的版本信息以及签名信息;
+	
