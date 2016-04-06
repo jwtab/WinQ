@@ -25,6 +25,9 @@
     <Filter Include="ModInfo">
       <UniqueIdentifier>{3be451af-9438-40d5-91e4-5a9aadf31f54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TaskInfo">
+      <UniqueIdentifier>{16d9fa28-a5f8-4c5a-8a63-635a9bdcc0f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -60,6 +63,12 @@
     <ClInclude Include="ModInfo\ModInfo_main.h">
       <Filter>ModInfo</Filter>
     </ClInclude>
+    <ClInclude Include="TaskInfo\TaskInfo.h">
+      <Filter>TaskInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskInfo\TaskInfo_main.h">
+      <Filter>TaskInfo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -91,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="ModInfo\ModInfo_main.cpp">
       <Filter>ModInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskInfo\TaskInfo.cpp">
+      <Filter>TaskInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskInfo\TaskInfo_main.cpp">
+      <Filter>TaskInfo</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

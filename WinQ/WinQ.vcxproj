@@ -156,6 +156,8 @@
     <ClInclude Include="PSInfo\PSInfo_main.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TaskInfo\TaskInfo.h" />
+    <ClInclude Include="TaskInfo\TaskInfo_main.h" />
     <ClInclude Include="UserInfo\UserInfo.h" />
     <ClInclude Include="UserInfo\UserInfo_main.h" />
   </ItemGroup>
@@ -172,6 +174,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TaskInfo\TaskInfo.cpp" />
+    <ClCompile Include="TaskInfo\TaskInfo_main.cpp" />
     <ClCompile Include="UserInfo\UserInfo.cpp" />
     <ClCompile Include="UserInfo\UserInfo_main.cpp" />
     <ClCompile Include="WinQ.cpp" />
